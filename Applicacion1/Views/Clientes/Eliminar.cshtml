@@ -1,0 +1,25 @@
+﻿@model Cliente
+@{
+    ViewData["Title"] = "Eliminar Clientes";
+}
+
+<div class="contairner">
+    <h3>
+        Eliminar de Clientes
+    </h3>
+    <br />
+</div>
+
+
+<div class="contairner">
+    <div class="row">
+        <div class="col-sm-8">
+            <form method="post" asp-controller="Clientes" asp-action="Eliminar">
+                <div class="form-group">
+                    <input type="submit" value="Eliminar" class="btn btn-primary" />
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+

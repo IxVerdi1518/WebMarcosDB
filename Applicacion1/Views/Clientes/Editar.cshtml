@@ -1,0 +1,38 @@
+﻿@model Cliente
+@{
+    ViewData["Title"] = "Editar Clientes";
+}
+
+<div class="contairner">
+    <h3>
+        Editar de Clientes
+    </h3>
+    <br />
+</div>
+
+
+<div class="contairner">
+    <div class="row">
+        <div class="col-sm-8">
+            <form method="post" asp-controller="Clientes" asp-action="Editar">
+                <div class="form-group">
+                    <label asp-for="Nombres" class="control-label"></label>
+                    <input asp-for="Nombres" class="form-control" />
+                </div>
+                <div class="form-group">
+                    <label asp-for="Apellidos" class="control-label"></label>
+                    <input asp-for="Apellidos" class="form-control" />
+                </div>
+                <div class="form-group">
+                    <label asp-for="Cedula" class="control-label"></label>
+                    <input asp-for="Cedula" class="form-control" />
+                </div>
+
+                <div class="form-group">
+                    <input type="submit" value="Crear" class="btn btn-primary" />
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+

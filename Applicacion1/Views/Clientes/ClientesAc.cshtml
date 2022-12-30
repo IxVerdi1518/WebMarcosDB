@@ -1,0 +1,55 @@
+﻿@model List<Cliente>
+@{
+    ViewData["Title"] = "Clientes";
+}
+
+<div class="contairner">
+    <h3>
+        Lista de Clientes
+    </h3>
+    <a asp-controller="Clientes" asp-action="Crear" class="btn btn-primary" width="10">Crear</a>
+    <a asp-controller="Clientes" asp-action="Clientes_ced_ape" class="btn btn-info" width="10">Clientes por cedula y apellidos </a>
+    <br />
+    <br />
+    <br />
+</div>
+
+
+<div class="contairner">
+    <div class="row">
+        @if (Model.Count() > 0)
+        {
+            <table class="table table-bordered">
+                <thead>
+                    <tr>
+                        <td>Identificacion</td>
+                        <td>Nombres</td>
+                        <td>Apellidos</td>
+                        <td>Cedula</td>
+                        <td>Accion</td>
+                    </tr>
+                </thead>
+                <tbody>
+                    @foreach (var item in Model)
+                    {
+                        <tr>
+                            <td>@item.Identificacion</td>
+                            <td>@item.Nombres</td>
+                            <td>@item.Apellidos</td>
+                            <td>@item.Cedula</td>
+                            <td>
+                                <a asp-controller="Clientes" asp-action="Eliminar" asp-route-id="@item.Identificacion" class="btn btn-primary">Eliminar</a>
+                                <a asp-controller="Clientes" asp-action="Editar" asp-route-id="@item.Identificacion" class="btn btn-primary">Editar</a>
+
+                            </td>
+                        </tr>
+                    }
+                </tbody>
+            </table>
+        }
+        else
+        {
+            <p>No existe registros</p>
+        }
+    </div>
+</div>
