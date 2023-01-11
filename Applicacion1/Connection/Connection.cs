@@ -18,33 +18,38 @@ namespace Applicacion1.Conexion
 			{
 				cn = new SqlConnection("Data Source=DESKTOP-KBQIMBE;Initial Catalog=Clientes;Integrated Security=True;Connect Timeout=30;Encrypt=False;TrustServerCertificate=False;ApplicationIntent=ReadWrite;MultiSubnetFailover=False");
 				cn.Open();
-				Console.WriteLine("Conectado");
 			}
 			catch (Exception ex)
 			{
-				Console.WriteLine(ex.ToString());
+				Console.WriteLine("No se conecto: "+ex.ToString());
 			}
-		}
+            Console.WriteLine("Conectado");
+        }
 
 		public string Insertar(Cliente cliente) 
 		{
 			string salida = "Se inserto";
-			try 
-			{
-				Cmd = new SqlCommand(" Insert into Cliente " + "(Nombres,Apellidos,Cedula) values (@Nombres,@Apellidos,@Cedula)", cn);
-				cmd.Parameters.Add("@Nombres", SqlDbType.NVarChar);
-				cmd.Parameters.Add("@Apellidos", SqlDbType.NVarChar);
-				cmd.Parameters.Add("@Cedula", SqlDbType.NVarChar);
-				cmd.Parameters["@Nombres"].Value = cliente.Nombres;
-				cmd.Parameters["@Apellidos"].Value = cliente.Apellidos;
-				cmd.Parameters["@Cedula"].Value = cliente.Cedula;
-				cmd.ExecuteNonQuery();
-			}
-			catch (Exception ex)
-			{
-				salida = "No se Inserto: " + ex.ToString();
-				Console.WriteLine(salida);
-			}
+			
+				try
+				{
+					Cmd = new SqlCommand(" Insert into Cliente " + "(Nombres,Apellidos,Cedula) values (@Nombres,@Apellidos,@Cedula)", cn);
+				}catch(SqlException ex)
+				{
+					Console.WriteLine("Error en la linea de comando: " + ex.ToString());
+				}
+				try
+				{
+					cmd.Parameters.Add("@Nombres", SqlDbType.NVarChar);
+					cmd.Parameters.Add("@Apellidos", SqlDbType.NVarChar);
+					cmd.Parameters.Add("@Cedula", SqlDbType.NVarChar);
+					cmd.Parameters["@Nombres"].Value = cliente.Nombres;
+					cmd.Parameters["@Apellidos"].Value = cliente.Apellidos;
+					cmd.Parameters["@Cedula"].Value = cliente.Cedula;
+					cmd.ExecuteNonQuery();
+				}catch(Exception ex)
+				{
+					Console.WriteLine("Error en la asignación de las variables: " + ex.ToString());
+				}
 			return salida;
 		}
 
@@ -54,44 +59,75 @@ namespace Applicacion1.Conexion
 			string consulta = "Se Consulto";
 			try
 			{
-				Cmd = new SqlCommand("select * from Cliente", cn);
+				try
+				{
+					Cmd = new SqlCommand("select * from Cliente", cn);
+				}catch(SqlException ex)
+				{
+					Console.WriteLine("Linea de comando incorrecto" + ex.ToString());
+				}
 				cmd.ExecuteNonQuery();
 				SqlDataReader reader = cmd.ExecuteReader();
 				{
-					while (reader.Read()) 
+					try
 					{
-						Cliente cl = new Cliente
+						while (reader.Read())
 						{
-							Identificacion = reader["IDCLIENTE"].ToString(),
-							Nombres = reader["Nombres"].ToString(),
-							Apellidos = reader["Apellidos"].ToString(),
-							Cedula = reader["Cedula"].ToString()
-						};
-						lista.Add(cl);
+							Cliente cl = new Cliente
+							{
+								Identificacion = reader["IDCLIENTE"].ToString(),
+								Nombres = reader["Nombres"].ToString(),
+								Apellidos = reader["Apellidos"].ToString(),
+								Cedula = reader["Cedula"].ToString()
+							};
+							lista.Add(cl);
+						}
+					}catch(Exception ex)
+					{
+						Console.WriteLine("Inconveniente con la asignación de las variables: " + ex.ToString());
 					}
 				}
 			}
 			catch (Exception ex) 
 			{
-				consulta = "No se pudo consultar: " + ex.ToString();
-				Console.WriteLine(consulta);
+				Console.WriteLine("No se pudo consultar: " + ex.ToString());
+				
 			}
-			return lista;
+            Console.WriteLine(consulta);
+            return lista;
 		}
 
 		public Cliente Consultar_id(int IdCliente)
 		{
-			Cmd = new SqlCommand("Select IDCLIENTE,Nombres, Apellidos, Cedula FROM Cliente WHERE IDCLIENTE = @IDCLIENTE", cn);
-			cmd.Parameters.Add("@IDCLIENTE", SqlDbType.Int);
-			cmd.Parameters["@IDCLIENTE"].Value = IdCliente;
+			try
+			{
+				Cmd = new SqlCommand("Select IDCLIENTE,Nombres, Apellidos, Cedula FROM Cliente WHERE IDCLIENTE = @IDCLIENTE", cn);
+			}catch(SqlException ex)
+			{
+				Console.WriteLine("Linea de comando incorrecto: " + ex.ToString());
+			}
+			try
+			{
+				cmd.Parameters.Add("@IDCLIENTE", SqlDbType.Int);
+				cmd.Parameters["@IDCLIENTE"].Value = IdCliente;
+			}catch(Exception ex)
+			{
+				Console.WriteLine("Asignacion de variables incorrecto: "+ex.ToString());
+			}
 			cmd.ExecuteNonQuery();
 			SqlDataReader reader= cmd.ExecuteReader();
 			Cliente cl = new Cliente();
-			if (reader.Read()) 
+			try
 			{
-				cl.Nombres = reader["Nombres"].ToString();
-				cl.Apellidos = reader["Apellidos"].ToString();
-				cl.Cedula = reader["Cedula"].ToString();
+				if (reader.Read())
+				{
+					cl.Nombres = reader["Nombres"].ToString();
+					cl.Apellidos = reader["Apellidos"].ToString();
+					cl.Cedula = reader["Cedula"].ToString();
+				}
+			}catch(Exception ex)
+			{
+				Console.WriteLine("Creacion incorrecta en el objeto Cliente: "+ex.ToString());
 			}
 			return cl;
 		}
@@ -102,27 +138,40 @@ namespace Applicacion1.Conexion
 			string consulta_ced_ape = "Se consulto";
 			try
 			{
-				Cmd = new SqlCommand("select Apellidos, Cedula from Cliente", cn);				
+				try
+				{
+					Cmd = new SqlCommand("select Apellidos, Cedula from Cliente", cn);
+				} catch(SqlException ex)
+				{
+					Console.WriteLine("Error en el comando de Consultar: " + ex.ToString());
+				}
 				cmd.ExecuteNonQuery();
 				using (SqlDataReader reader = cmd.ExecuteReader())
 				{
-					while (reader.Read())
+					try
 					{
-						Cliente cl = new Cliente
+						while (reader.Read())
 						{
-							Cedula = reader["Cedula"].ToString(),
-							Apellidos = reader["Apellidos"].ToString()
-						};
-						lista.Add(cl);
+							Cliente cl = new Cliente
+							{
+								Cedula = reader["Cedula"].ToString(),
+								Apellidos = reader["Apellidos"].ToString()
+							};
+							lista.Add(cl);
+						}
+					}catch(Exception ex)
+					{
+						Console.WriteLine("Asignacion incorrecta en el objeto Cliente: " + ex.ToString());
 					}
 				}
 			}
 			catch(Exception ex) 
 			{
-				consulta_ced_ape = "No se pudo Consultar: " + ex.ToString();
-				Console.WriteLine (consulta_ced_ape);
+				Console.WriteLine("No se pudo Consultar: " + ex.ToString());
+				
 			}
-			return lista;
+            Console.WriteLine(consulta_ced_ape);
+            return lista;
 		}
 
 		public string Actualizar(int IDCLIENTE,Cliente cliente)
@@ -130,23 +179,34 @@ namespace Applicacion1.Conexion
 			string actualizar = "Se Actualizo";
 			try 
 			{
-				cmd = new SqlCommand("UPDATE Cliente Set Nombres = @Nombres, Apellidos = @Apellidos, Cedula = @Cedula where IDCLIENTE = @IDCLIENTE", cn);
-				cmd.Parameters.Add("@IDCLIENTE", SqlDbType.Int);
-				cmd.Parameters["@IDCLIENTE"].Value = IDCLIENTE;
-				cmd.Parameters.Add("@Nombres", SqlDbType.NVarChar);
-				cmd.Parameters["@Nombres"].Value = cliente.Nombres;
-				cmd.Parameters.Add("@Apellidos", SqlDbType.NVarChar);
-				cmd.Parameters["@Apellidos"].Value = cliente.Apellidos;
-				cmd.Parameters.Add("@Cedula", SqlDbType.NVarChar);
-				cmd.Parameters["@Cedula"].Value = cliente.Cedula;
-				cmd.ExecuteNonQuery();
+				try
+				{
+					cmd = new SqlCommand("UPDATE Cliente Set Nombres = @Nombres, Apellidos = @Apellidos, Cedula = @Cedula where IDCLIENTE = @IDCLIENTE", cn);
+				}catch(SqlException ex)
+				{
+					Console.WriteLine("Error en la linea de comando: " + ex.ToString());
+				}
+				try
+				{
+					cmd.Parameters.Add("@IDCLIENTE", SqlDbType.Int);
+					cmd.Parameters["@IDCLIENTE"].Value = IDCLIENTE;
+					cmd.Parameters.Add("@Nombres", SqlDbType.NVarChar);
+					cmd.Parameters["@Nombres"].Value = cliente.Nombres;
+					cmd.Parameters.Add("@Apellidos", SqlDbType.NVarChar);
+					cmd.Parameters["@Apellidos"].Value = cliente.Apellidos;
+					cmd.Parameters.Add("@Cedula", SqlDbType.NVarChar);
+					cmd.Parameters["@Cedula"].Value = cliente.Cedula;
+					cmd.ExecuteNonQuery();
+				}catch(Exception ex)
+				{
+					Console.WriteLine("Incoveniente al asignar las variables:"+ex.ToString());
+				}
 			}
 			catch(Exception ex) 
 			{
-				actualizar = "No se actualizo: " + ex.ToString();
-				Console.WriteLine (actualizar);
+				Console.WriteLine("No se ejecuto: " + ex.ToString());
 			}
-			return actualizar;
+            return actualizar;
 		}
 
 
@@ -155,14 +215,26 @@ namespace Applicacion1.Conexion
 			string eliminar = "Se elimino";
 			try 
 			{
-				cmd = new SqlCommand("Delete Cliente where IDCLIENTE = @IDCLIENTE", cn);
-				cmd.Parameters.Add("@IDCLIENTE", SqlDbType.Int);
-				cmd.Parameters["@IDCLIENTE"].Value=IDCLIENTE;
-				cmd.ExecuteNonQuery();
+				try
+				{
+					cmd = new SqlCommand("Delete Cliente where IDCLIENTE = @IDCLIENTE", cn);
+				} catch(SqlException ex)
+				{
+					Console.WriteLine("Linea de comando incorrecto: " + ex.ToString());
+				}
+				try
+				{
+					cmd.Parameters.Add("@IDCLIENTE", SqlDbType.Int);
+					cmd.Parameters["@IDCLIENTE"].Value = IDCLIENTE;
+					cmd.ExecuteNonQuery();
+				}catch (Exception ex)
+				{
+					Console.WriteLine("Asignación incorrecto: " + ex.ToString());
+				}
 			}
 			catch(Exception ex) 
 			{
-				eliminar = "No se elimino: " + ex.ToString();
+				Console.WriteLine("No se elimino: " + ex.ToString());
 
 			}
 			return eliminar;
